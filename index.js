@@ -373,13 +373,34 @@ async function buildTranslatedBlocks(id, nestedDepth) {
   return translatedBlocks;
 }
 
+(async function () {
+  let originalBlock;
+  const contentId = url.split("/").last().split("-").last();
+  try {
+    originalBlock = await notion.blocks.retrieve({
+      block_id: bff713ee121d4eeca21679ca4f211413#1d3ce130b7ee4e7e910ea7c81f0f18e4,
+    });
+  } catch (e) {
+    try {
+      await notion.databases.retrieve({ database_id: contentId });
+      console.error(
+        "\nERROR: This URL is a database. This tool currently supports only pages.\n"
+      );
+    } catch (_) {
+      console.error(
+        `\nERROR: Failed to read the page content!\n\nError details: ${e}\n\nPlease make sure the following:\n * The page is shared with your app\n * The API token is the one for this workspace\n`
+      );
+    }
+    process.exit(1);
+  }
+  if (debug) {
+    console.log(`The page metadata: ${toPrettifiedJSON(originalBlock)}`);
+  }
+
   process.stdout.write(
     `\nWait a minute! Now translating the following Notion page:\n${url}\n\n(this may take some time) ...`
   );
-  const translatedBlocks = await buildTranslatedBlocks(originalPage.id, 0);
-  const updateBlock = await notion.blocks.retrieve({
-    block_id: bff713ee121d4eeca21679ca4f211413#1d3ce130b7ee4e7e910ea7c81f0f18e4,
-  });
+  const translatedBlocks = await BuildTranslatedBlocks(originalBlock.block_id, 0);
   const blocksAppendParams = {
     block_id: bff713ee121d4eeca21679ca4f211413#1d3ce130b7ee4e7e910ea7c81f0f18e4,
     children: translatedBlocks,
