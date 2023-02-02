@@ -142,7 +142,7 @@ const { Command } = require("commander");
 const program = new Command();
 
 program
-  .name("notion-translator")
+  .name("block-translator")
   .description("CLI to translate a Notion page to a different language")
   .requiredOption("-u, --url <https://www.notion.so/...>")
   .requiredOption(`-f, --from <${printableSupportedFromLangs}>`)
